@@ -15,13 +15,14 @@ type StartDurPair = Either String (String,String)
 
 -- Generate a list of pairs from a list of hms strings
 mkStartStopList :: [String] -> [(HmsString, HmsString)]
-mkStartStopList = toHms . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec
+mkStartStopList = toHms . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
   where
     toHms            = map (secToHms *** secToHms)
     stopsToDurations = map tupleABDiff
     pairUpNums       = foldl (\acc time -> (snd $ head acc,time):acc) startingPair
     startingPair     = [(Right 0.0, Right 0.0)]
     mapHmsToSec      = map hmsToSec
+    duplicateLast a  = a ++ [last a]
 
 hmsToSec :: String -> HmsValue
 hmsToSec a = listToSeconds components
