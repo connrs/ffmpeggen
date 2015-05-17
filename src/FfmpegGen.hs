@@ -1,11 +1,30 @@
+-- module FfmpegGen (
+--   hmsToSec,
+--   secToHms,
+--   mkStartStopList
+-- ) where
 module FfmpegGen where
 
+import           Control.Applicative
+import           Control.Arrow
 import           Data.Either
 import           Data.List
-import qualified Data.Text   as T
+import qualified Data.Text           as T
 import           Text.Read
 
-type HmsValue = Either String Double
+type HmsValue     = Either String Double
+type HmsString    = Either String String
+type StartDurPair = Either String (String,String)
+
+-- Generate a list of pairs from a list of hms strings
+mkStartStopList :: [String] -> [(HmsString, HmsString)]
+mkStartStopList = toHms . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec
+  where
+    toHms            = map (secToHms *** secToHms)
+    stopsToDurations = map tupleABDiff
+    pairUpNums       = foldl (\acc time -> (snd $ head acc,time):acc) startingPair
+    startingPair     = [(Right 0.0, Right 0.0)]
+    mapHmsToSec      = map hmsToSec
 
 hmsToSec :: String -> HmsValue
 hmsToSec a = listToSeconds components
@@ -14,8 +33,11 @@ hmsToSec a = listToSeconds components
     hmsList        = splitByColon a
     splitByColon b = T.split (== ':') $ T.pack b
 
-secToHms :: RealFrac a => a -> [Char]
-secToHms a = hms ++ decimals
+secToHms :: HmsValue -> HmsString
+secToHms = fmap secToHms'
+
+secToHms' :: RealFrac a => a -> String
+secToHms' a = hms ++ decimals
   where
     seconds  = floor a
     decimals = getDecimals a
@@ -25,7 +47,7 @@ secToHms a = hms ++ decimals
     hms      = intercalate ":" (map (lp2 . show) [h,m,s])
     lp2      = leftPad 2 '0'
 
-getDecimals :: RealFrac s => s -> [Char]
+getDecimals :: RealFrac s => s -> String
 getDecimals a = "." ++ decimals
   where
     decimals = take 3 $ lp3 $ show rounded
@@ -61,3 +83,8 @@ leftPad n c s
 
 -- Infinite array of the powers of 60
 powersOf60 = map (\x -> 60^x) [0..]
+
+-- Take a (start,stop) pair and turn stop in to the difference of stop - start
+tupleABDiff :: (Applicative f, Num b) => (f b, f b) -> (f b, f b)
+tupleABDiff (a,b) = (a, subtract <$> a <*> b)
+
