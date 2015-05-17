@@ -1,9 +1,6 @@
--- module FfmpegGen (
---   hmsToSec,
---   secToHms,
---   mkStartStopList
--- ) where
-module FfmpegGen where
+module FfmpegGen (
+  mkStartStopList
+) where
 
 import           Control.Applicative
 import           Control.Arrow
@@ -47,6 +44,7 @@ secToHms' a = hms ++ decimals
     hms      = intercalate ":" (map (lp2 . show) [h,m,s])
     lp2      = leftPad 2 '0'
 
+-- Take a number and pull out a string that contains 3dp, eg: ".123"
 getDecimals :: RealFrac s => s -> String
 getDecimals a = "." ++ decimals
   where
@@ -66,7 +64,7 @@ listToSeconds' :: [HmsValue] -> Double
 listToSeconds' a = sum $ zipWith (curry pairEitherMult) a powersOf60
 
 pairEitherMult :: Num a => (Either t a, a) -> a
-pairEitherMult (Left e, b)  = 0
+pairEitherMult (Left _, _)  = 0
 pairEitherMult (Right a, b) = a * b
 
 textToHmsValue :: T.Text -> HmsValue
