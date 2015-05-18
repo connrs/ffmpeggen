@@ -11,13 +11,13 @@ import           Text.Read
 
 type HmsValue     = Either String Double
 type HmsString    = Either String String
-type StartDurPair = Either String (String,String)
+type StartDur = Either String (String,String)
 
 -- Generate a list of pairs from a list of hms strings
-mkStartStopList :: [String] -> [(HmsString, HmsString)]
-mkStartStopList = toHms . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
+mkStartStopList :: [String] -> [StartDur]
+mkStartStopList = toStartDurList . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
   where
-    toHms            = map (secToHms *** secToHms)
+    toStartDurList   = map (secToHms *** secToHms)
     stopsToDurations = map tupleABDiff
     pairUpNums       = foldl (\acc time -> (snd $ head acc,time):acc) startingPair
     startingPair     = [(Right 0.0, Right 0.0)]
