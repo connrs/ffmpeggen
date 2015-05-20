@@ -1,11 +1,12 @@
 module FfmpegGen (
-  mkStartStopList
+--   mkStartStopList
 ) where
 
 import           Control.Applicative
 import           Control.Arrow
 import           Data.Either
-import           Data.List
+import qualified Data.List           as L
+import           Data.Monoid
 import qualified Data.Text           as T
 import           Text.Read
 
@@ -14,21 +15,26 @@ type HmsString    = Either String String
 type StartDur = Either String (String,String)
 
 -- Generate a list of pairs from a list of hms strings
+-- amkStartStopList = toStartDurList . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
 mkStartStopList :: [String] -> [StartDur]
-mkStartStopList = toStartDurList . stopsToDurations . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
+mkStartStopList = toStartDurList . map tupleABDiff . reverse . init . pairUpNums . mapHmsToSec . duplicateLast
   where
-    toStartDurList   = map (secToHms *** secToHms)
-    stopsToDurations = map tupleABDiff
+    toStartDurList   = map (pairEitherToEitherPair . (secToHms *** secToHms))
     pairUpNums       = foldl (\acc time -> (snd $ head acc,time):acc) startingPair
     startingPair     = [(Right 0.0, Right 0.0)]
     mapHmsToSec      = map hmsToSec
     duplicateLast a  = a ++ [last a]
 
+pairEitherToEitherPair :: (Either a b, Either a c) -> Either a (b, c)
+pairEitherToEitherPair (Right a, Right b) = Right (a, b)
+pairEitherToEitherPair (Left a, _) = Left a
+pairEitherToEitherPair (Right _, Left a) = Left a
+
 hmsToSec :: String -> HmsValue
 hmsToSec a = listToSeconds components
   where
-    components     = (map textToHmsValue . reverse) hmsList
-    hmsList        = splitByColon a
+    components     = (map textToHmsValue . reverse) hmsStringList
+    hmsStringList        = splitByColon a
     splitByColon b = T.split (== ':') $ T.pack b
 
 secToHms :: HmsValue -> HmsString
@@ -42,7 +48,7 @@ secToHms' a = hms ++ decimals
     h        = seconds `div` 3600
     m        = (seconds `div` 60) `mod` 60
     s        = seconds `mod` 60
-    hms      = intercalate ":" (map (lp2 . show) [h,m,s])
+    hms      = L.intercalate ":" (map (lp2 . show) [h,m,s])
     lp2      = leftPad 2 '0'
 
 -- Take a number and pull out a string that contains 3dp, eg: ".123"
