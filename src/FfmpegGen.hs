@@ -1,5 +1,5 @@
 module FfmpegGen (
---   mkStartStopList
+   mkStartStopList
 ) where
 
 import           Control.Applicative
@@ -87,6 +87,7 @@ leftPad n c s
     excess = n - length s
 
 -- Infinite array of the powers of 60
+powersOf60 :: [Double]
 powersOf60 = map (\x -> 60^x) [0..]
 
 -- Take a (start,stop) pair and turn stop in to the difference of stop - start
