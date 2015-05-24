@@ -6,7 +6,6 @@ import           Control.Applicative
 import           Control.Arrow
 import           Data.Either
 import qualified Data.List           as L
-import           Data.Monoid
 import qualified Data.Text           as T
 import           Text.Read
 

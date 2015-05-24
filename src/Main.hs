@@ -1,7 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-import           Data.List
-import           Data.Monoid
 import           FfSplitGen
 import           System.Environment
 
