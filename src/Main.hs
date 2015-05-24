@@ -2,7 +2,7 @@
 
 import           Data.List
 import           Data.Monoid
-import           FfmpegGen
+import           FfSplitGen
 import           System.Environment
 
 main :: IO ()
@@ -10,7 +10,7 @@ main = do
     args <- getArgs
     let fileName = head args
     let hmsList = tail args
-    putStr $ buildFfmpegSplitCmd fileName hmsList
+    putStrLn $ buildFfmpegSplitCmd fileName hmsList
     return ()
 
 buildFfmpegSplitCmd :: String -> [String] -> String

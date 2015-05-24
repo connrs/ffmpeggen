@@ -1,4 +1,4 @@
-module FfmpegGen (
+module FfSplitGen (
    mkStartStopList
 ) where
 
