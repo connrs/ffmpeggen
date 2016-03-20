@@ -16,3 +16,5 @@ cabal.sandbox.config
 
 # Project files
 .idea
+*.iml
+.stack-work

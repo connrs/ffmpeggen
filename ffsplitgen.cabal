@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                ffsplitgen
-version:             0.1.0.2
+version:             1.0.0.0
 -- synopsis:            
 -- description:         
 license:             Apache-2.0
@@ -17,8 +17,8 @@ cabal-version:       >=1.10
 
 executable ffsplitgen
   main-is:             Main.hs
-  -- other-modules:       
+  other-modules:       BuildCommand, HMSTime
   -- other-extensions:    
-  build-depends:       base >=4.7 && <4.8, text >=1.2 && <1.3, text-format
+  build-depends:       base >=4.8, text >=1.2 && <1.3, text-format
   hs-source-dirs:      src
   default-language:    Haskell2010

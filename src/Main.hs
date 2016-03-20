@@ -1,27 +1,25 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-import           FfSplitGen
+import           BuildCommand
+import           Data.Maybe
 import           System.Environment
+import           System.Exit
+import           System.IO
 
 main :: IO ()
 main = do
     args <- getArgs
-    let fileName = head args
-    let hmsList = tail args
-    putStrLn $ buildFfmpegSplitCmd fileName hmsList
-    return ()
+    if length args /= 4
+        then dieWithMessage "Invalid arguments list"
+        else generateCommand args
 
-buildFfmpegSplitCmd :: String -> [String] -> String
-buildFfmpegSplitCmd fileName hmsList = commandHead fileName ++ mkBody hmsList
+generateCommand :: [String] -> IO ()
+generateCommand args = do
+            let [fileName,extension,commonParams,times] = args
+            let command = buildCommand fileName extension commonParams (words times)
+            maybe (dieWithMessage "Invalid time list") putStrLn command
 
-mkBody :: [String] -> String
-mkBody hmsList = foldr commandBody "" (zip [0..] $ mkStartStopList hmsList)
-
-commandHead :: String -> String
-commandHead a = "ffmpeg -i \"" ++ a ++ "\""
-
-commandBody :: Show a => (a, Either String (String, String)) -> String -> String
-commandBody (_, Left a) _ = error a
-commandBody (i, Right (a,_)) "" = " -c:v libx264 -c:a libfaac -ss " ++ a ++ " " ++ show i ++ ".mp4"
-commandBody (i, Right (a,b)) acc = " -c:v libx264 -c:a libfaac -ss " ++ a ++ " -t " ++ b ++ " " ++ show i ++ ".mp4" ++ acc
-
+dieWithMessage :: String -> IO ()
+dieWithMessage a = do
+    hPutStrLn stderr a
+    exitWith (ExitFailure 1)
