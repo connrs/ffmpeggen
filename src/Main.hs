@@ -11,12 +11,12 @@ main = do
     args <- getArgs
     if length args /= 4
         then dieWithMessage "Invalid arguments list"
-        else generateCommand args
+        else generate args
 
-generateCommand :: [String] -> IO ()
-generateCommand args = do
+generate :: [String] -> IO ()
+generate args = do
             let [fileName,extension,commonParams,times] = args
-            let command = buildCommand fileName extension commonParams (words times)
+            let command = generateCommand fileName extension commonParams (words times)
             maybe (dieWithMessage "Invalid time list") putStrLn command
 
 dieWithMessage :: String -> IO ()
