@@ -1,7 +1,7 @@
 module HMSTime ( mkHMSTime
                , fromDouble
                , toDouble
-               , HMSTime
+               , HMSTime(..)
                ) where
 
 import           Data.List
@@ -13,11 +13,14 @@ maxMinutes = 59
 maxMilliseconds = 999
 
 -- Data type
-data HMSTime = HMSTime { hour        :: Int
-                       , minute      :: Int
-                       , second      :: Int
-                       , millisecond :: Int
-                       }
+data HMSTime = MkHMSTime { hour        :: Int
+                         , minute      :: Int
+                         , second      :: Int
+                         , millisecond :: Int
+                         }
+             | EndHMSTime
+             | StartHMSTime
+             deriving Eq
 
 instance Read HMSTime where
     readsPrec _ (h1:h2:':':m1:m2:':':s1:s2:'.':ms1:ms2:ms3:excess) =
@@ -35,17 +38,19 @@ instance Read HMSTime where
     readsPrec _ _ = []
 
 instance Show HMSTime where
-    show a = intercalate ":" [h,m,s] ++ "." ++ ms
+    show EndHMSTime   = error "It is not possible to display the end time"
+    show StartHMSTime = "00:00:00.000"
+    show a            = intercalate ":" [h,m,s] ++ "." ++ ms
         where pad3 = leftPad 3 '0' . show
               pad2 = leftPad 2 '0' . show
-              h  = pad2 $ hour a
-              m  = pad2 $ minute a
-              s  = pad2 $ second a
-              ms = pad3 $ millisecond a
+              h    = pad2 $ hour a
+              m    = pad2 $ minute a
+              s    = pad2 $ second a
+              ms   = pad3 $ millisecond a
 
 -- Construct an HMSTime
 mkHMSTime h m s ms
-    | validComponents m s ms = HMSTime { hour=h, minute=m, second=s, millisecond=ms }
+    | validComponents m s ms = MkHMSTime { hour=h, minute=m, second=s, millisecond=ms }
     | otherwise              = error "Bad HMSTime"
     where
         validComponents m s ms = (m <= maxMinutes) && (s <= maxSeconds)
