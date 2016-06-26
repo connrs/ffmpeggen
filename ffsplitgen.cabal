@@ -17,8 +17,21 @@ cabal-version:       >=1.10
 
 executable ffsplitgen
   main-is:             Main.hs
-  other-modules:       BuildCommand, HMSTime
+  other-modules:       BuildCommand, HMSTime, Utilities
   -- other-extensions:    
-  build-depends:       base >=4.8, text >=1.2 && <1.3, text-format
-  hs-source-dirs:      src
+  build-depends:       base >=4.8
+                     , text >=1.2 && <1.3
+                     , text-format
+                     , QuickCheck
+  hs-source-dirs:      src, test
+  default-language:    Haskell2010
+
+test-suite ffsplitgen-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test, src
+  main-is:             Spec.hs
+  build-depends:       base >=4.8
+                     , text >=1.2 && <1.3
+                     , text-format
+                     , QuickCheck
   default-language:    Haskell2010
