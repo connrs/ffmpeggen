@@ -5,7 +5,8 @@ module HMSTimeSpec where
 import HMSTime
 import Test.QuickCheck.All
 
-tdp :: (Integral a) => a -> Double -> Double
+tdp :: (Integral a)
+    => a -> Double -> Double
 tdp n f = fromInteger (round $ f * (10 ^ n)) / (10.0 ^^ n)
 
 -- Going from Double to HMSTime and back again produces the same number

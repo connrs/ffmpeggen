@@ -2,7 +2,8 @@
 
 import           FFMpegCommand
 import           System.Environment
-import           Utilities
+import           System.Exit
+import           System.IO
 
 main :: IO ()
 main = do
@@ -16,3 +17,8 @@ generate args = do
   let [fileName, extension, commonParams, times] = args
   let command = generateCommand fileName extension commonParams (words times)
   maybe (dieWithMessage "Invalid time list") putStrLn command
+
+dieWithMessage :: String -> IO ()
+dieWithMessage a = do
+  hPutStrLn stderr a
+  exitWith (ExitFailure 1)

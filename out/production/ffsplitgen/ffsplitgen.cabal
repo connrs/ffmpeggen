@@ -18,7 +18,7 @@ cabal-version:       >=1.10
 executable ffsplitgen
   main-is:             Main.hs
   other-modules:       FFMpegCommand, HMSTime, Utilities, Command
-  -- other-extensions:
+  -- other-extensions:    
   build-depends:       base >=4.8
                      , text >=1.2 && <1.3
                      , text-format
